@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: doc-mind-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: docmind
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    healthcheck:
+      # Explain the command: pg_isready is a utility that checks the connection status of a PostgreSQL database server. It returns a success status if the server is accepting connections, and a failure status otherwise. The -U option specifies the username to connect with, and the -d option specifies the database name to check.
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d docmind"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+volumes:
+  pg_data:
